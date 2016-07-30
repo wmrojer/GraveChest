@@ -1,0 +1,17 @@
+[
+{
+  "modid": "gravechest",
+  "name": "Grave Chest",
+  "description": "The Grave Chest mod.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "logoFile": "",
+  "url": "",
+  "updateUrl": "",
+  "authors": ["me",],
+  "credits": "youpu & Ganysmede01",
+  "parent": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

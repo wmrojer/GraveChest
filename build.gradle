@@ -1,0 +1,115 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = 'forge'
+            url = 'http://files.minecraftforge.net/maven'
+        }
+        maven {
+            name = 'sonatype'
+            url = 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+    }
+}
+
+apply plugin: 'forge'
+
+ext {
+	//Import config file thanks to pahimar :D
+	ext.configFile = file "buildconfig.properties"
+}
+
+configFile.withReader {
+    // read config. it shall from now on be referenced as simply config or as project.config
+    def prop = new Properties()
+    prop.load(it)
+    ext.config = new ConfigSlurper().parse prop
+}
+
+ext.buildnumber = 0
+if(System.getenv('BUILD_NUMBER') != null)
+    project.buildnumber = System.getenv('BUILD_NUMBER')
+
+version = config.mod_version+"."+config.buildNumber
+
+minecraft {
+    version = config.minecraft_version + "-" + config.forge_version
+
+	replaceIn "ModInfo.java"
+	replace "@VERSION@", project.version
+
+    runDir = "eclipse"
+}
+
+group = "gravechest"
+archivesBaseName = "GraveChest-"+minecraft.version
+
+
+dependencies {
+}
+
+processResources {
+    exclude('**/*.psd')
+
+    // this will ensure that this task is redone when the versions change.
+    inputs.property 'version', project.version
+    inputs.property 'mcversion', project.minecraft.version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+
+        // replace version and mcversion
+        expand 'version': project.version, 'mcversion': project.minecraft.version
+    }
+
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+jar {
+	exclude '**/*.bak'
+	includeEmptyDirs = false
+}
+
+task srcJar(type: Jar) {
+	from(sourceSets.main.allSource) {
+		include '**'
+		exclude '**/*.bak'
+	}
+
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+	classifier = 'src'
+}
+
+task devJar(type: Jar) {
+	from(sourceSets.main.output) {
+		include '**'
+		exclude '**/*.bak'
+	}
+
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+	classifier = 'dev'
+}
+
+task buildnumberplusone {
+  Properties props = new Properties()
+  File propsFile = new File("buildconfig.properties")
+  props.load(propsFile.newDataInputStream())
+  Integer nextbuildnum = ( ((props.getProperty("buildNumber")) as BigDecimal) + 1 )
+  props.setProperty("buildNumber", nextbuildnum.toString())
+  props.store(propsFile.newWriter(), null)
+  props.load(propsFile.newDataInputStream())
+}
+
+artifacts {
+    //archives srcJar
+    archives devJar
+}
