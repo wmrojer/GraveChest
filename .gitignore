@@ -53,3 +53,5 @@ usernamecache.json
 *.bak
 /bin/
 /build/
+/logs/
+/saves/

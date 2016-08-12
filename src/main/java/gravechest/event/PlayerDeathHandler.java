@@ -31,9 +31,9 @@ public class PlayerDeathHandler {
             List<ItemStack> itemStacks = ItemUtil.getItemStacks(event.drops);
             int oy = 0;
             
-            while (((y - oy) > 1) && ((y + oy) < (world.getActualHeight() - 1))) {
+            while (((y - oy) > 0) || ((y + oy) < world.getActualHeight())) {
 	            for (int i = 0; i < ox.length; i++ ) {
-	            	if ((y + oy) < (world.getActualHeight() - 1)) {
+	            	if ((y + oy) < (world.getActualHeight())) {
 		            	if (spawnGrave(world, x+ox[i], y+oy, z+oz[i], itemStacks)) {
 		            		event.setCanceled(true);
 		            		return;
